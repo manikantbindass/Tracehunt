@@ -1,0 +1,38 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.db
+*.db-shm
+*.db-wal
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+npm-debug.log*
+
+# Local output
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+artifacts/
+.tmp/
+test-results/
+playwright-report/
+*.log

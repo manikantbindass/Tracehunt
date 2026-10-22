@@ -1,0 +1,112 @@
+name: tracehunt
+
+x-api-environment: &api-environment
+  DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-tracehunt}:${POSTGRES_PASSWORD:-tracehunt-local-change-me}@postgres:5432/${POSTGRES_DB:-tracehunt}
+  REDIS_URL: redis://redis:6379/0
+  DEMO_MODE: ${DEMO_MODE:-true}
+  SEED_DEMO: ${SEED_DEMO:-true}
+  API_KEY: ${API_KEY:-}
+  CORS_ORIGINS: '${CORS_ORIGINS:-["http://localhost:3000","http://127.0.0.1:3000"]}'
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-mini}
+  MONITOR_ALLOW_PRIVATE_NETWORKS: ${MONITOR_ALLOW_PRIVATE_NETWORKS:-false}
+  ALERT_WEBHOOK_URL: ${ALERT_WEBHOOK_URL:-}
+  ERROR_THRESHOLD: ${ERROR_THRESHOLD:-5}
+  ERROR_WINDOW_SECONDS: ${ERROR_WINDOW_SECONDS:-300}
+  INCIDENT_COOLDOWN_SECONDS: ${INCIDENT_COOLDOWN_SECONDS:-900}
+  MAX_BODY_BYTES: ${MAX_BODY_BYTES:-1048576}
+  RETENTION_DAYS: ${RETENTION_DAYS:-30}
+  RUN_WORKER: "false"
+
+services:
+  # Disposable, internal-only HTTP target for CI monitor checks.
+  probe:
+    image: nginx:alpine
+    profiles: [test]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-tracehunt}
+      POSTGRES_USER: ${POSTGRES_USER:-tracehunt}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tracehunt-local-change-me}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: ops/Dockerfile.api
+    environment: *api-environment
+    command: ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready', timeout=4)"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: ops/Dockerfile.api
+    environment: *api-environment
+    command: ["python", "-m", "app.worker"]
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: ops/Dockerfile.web
+      args:
+        API_INTERNAL_URL: http://api:8000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  redis-data:
