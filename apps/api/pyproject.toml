@@ -16,7 +16,7 @@ dependencies = [
   "pydantic-settings>=2.7,<3",
   "httpx>=0.28,<1",
   "redis>=5.2,<7",
-  "openai>=1.70,<3",
+  "openai>=1.70,<4",
 ]
 
 [project.optional-dependencies]
