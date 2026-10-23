@@ -25,6 +25,13 @@ The repository includes a functional Next.js application, a FastAPI backend, per
 
 > **Scope:** This release is a single-workspace application and development foundation. The demo is intentionally open on localhost. Shared API-key authentication is available for a private deployment; multi-tenant identity, SSO, RBAC, distributed tracing, and automatic remediation are not implemented.
 
+## Project guide and presentation
+
+- [Complete project guide (PDF, 24 pages)](docs/project-overview/TraceHunt-AI-Project-Guide.pdf)
+- [Project presentation (PowerPoint, 24 slides)](docs/project-overview/TraceHunt-AI-Project-Presentation.pptx)
+
+Both explain the problem, solution, architecture, ingestion, monitoring, incident rules, AI analysis, database, reliability, setup, security, and roadmap. The PowerPoint includes detailed speaker notes, editable diagrams, and editable charts. Graphs use clearly labeled illustrative data, not measured performance results. See the [document index](docs/project-overview/README.md) for topic navigation and source details.
+
 ## Capabilities
 
 | Area | Included behavior |
