@@ -25,6 +25,14 @@ The repository includes a functional Next.js application, a FastAPI backend, per
 
 > **Scope:** This release is a single-workspace application and development foundation. The demo is intentionally open on localhost. Shared API-key authentication is available for a private deployment; multi-tenant identity, SSO, RBAC, distributed tracing, and automatic remediation are not implemented.
 
+## Live application preview
+
+Captured from TraceHunt running locally at `http://127.0.0.1:3001` on 24 October 2026. The screenshot shows the demo workspace with the **Last 7 days** view selected; displayed telemetry includes synthetic demo and smoke-test records.
+
+[![TraceHunt AI running locally: overview metrics and traffic chart](docs/images/tracehunt-preview.jpg)](docs/images/tracehunt-overview.jpg)
+
+[View the full dashboard screenshot](docs/images/tracehunt-overview.jpg)
+
 ## Project guide and presentation
 
 - [Complete project guide (PDF, 24 pages)](docs/project-overview/TraceHunt-AI-Project-Guide.pdf)
