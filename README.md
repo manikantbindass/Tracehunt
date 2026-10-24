@@ -33,6 +33,22 @@ Captured from TraceHunt running locally at `http://127.0.0.1:3001` on 24 October
 
 [View the full dashboard screenshot](docs/images/tracehunt-overview.jpg)
 
+<details>
+<summary>API monitors: endpoint health, latency, and check controls</summary>
+
+![TraceHunt API monitors running locally with five synthetic demo monitors](docs/images/tracehunt-monitors.jpg)
+
+</details>
+
+<details>
+<summary>Incident intelligence: evidence-based investigations and local analysis</summary>
+
+![TraceHunt Incident Intelligence running locally with heuristic investigations](docs/images/tracehunt-intelligence.jpg)
+
+</details>
+
+These additional live captures use the same local demo workspace. Intelligence results shown here come from the local heuristic analyzer.
+
 ## Project guide and presentation
 
 - [Complete project guide (PDF, 24 pages)](docs/project-overview/TraceHunt-AI-Project-Guide.pdf)
